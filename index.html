@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kriptosistem Klasik - Tugas 1 Kriptografi</title>
+<style>
+  :root { --bg:#f4f6fa; --card:#fff; --ink:#1c2333; --mut:#667085; --acc:#2f5bea; --line:#d9dfea; --ok:#12805c; --err:#c0392b; }
+  * { box-sizing: border-box; }
+  body { margin:0; font:15px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif; background:var(--bg); color:var(--ink); }
+  header { background:var(--acc); color:#fff; padding:18px 24px; }
+  header h1 { margin:0; font-size:20px; }
+  header p { margin:2px 0 0; opacity:.85; font-size:13px; }
+  main { max-width:960px; margin:20px auto; padding:0 16px 40px; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:18px; margin-bottom:16px; }
+  .tabs { display:flex; gap:8px; margin-bottom:16px; }
+  .tab { padding:8px 18px; border:1px solid var(--line); background:#fff; border-radius:8px; cursor:pointer; font-weight:600; }
+  .tab.on { background:var(--acc); color:#fff; border-color:var(--acc); }
+  label { display:block; font-weight:600; margin:12px 0 4px; }
+  select, input[type=text], textarea { width:100%; padding:9px 10px; border:1px solid var(--line); border-radius:8px; font:inherit; background:#fff; }
+  textarea { min-height:130px; font-family:ui-monospace,Menlo,Consolas,monospace; font-size:13.5px; resize:vertical; }
+  .hint { color:var(--mut); font-size:12.5px; margin-top:4px; }
+  .row { display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-top:12px; }
+  button { padding:9px 16px; border:0; border-radius:8px; background:var(--acc); color:#fff; font:inherit; font-weight:600; cursor:pointer; }
+  button.sec { background:#e8ecf5; color:var(--ink); }
+  button.dec { background:#12805c; }
+  button:disabled { opacity:.5; cursor:not-allowed; }
+  .grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  @media (max-width:720px){ .grid { grid-template-columns:1fr; } }
+  #msg { margin-top:10px; padding:9px 12px; border-radius:8px; display:none; font-size:14px; }
+  #msg.err { display:block; background:#fdecea; color:var(--err); }
+  #msg.ok { display:block; background:#e6f6ef; color:var(--ok); }
+  .radio { display:inline-flex; gap:5px; align-items:center; margin-right:14px; font-weight:400; }
+  .hide { display:none; }
+  code { background:#eef1f8; padding:1px 5px; border-radius:4px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Kriptosistem Klasik - Tugas 1 Kelompok 07 Kriptografi PSDKU UNS</h1>
+  <p>Kelompok: Fidela Novelia, Laely Nisrina, Nazwa Nur Aisyiyah Jafni</p>
+  <p>Shift · Substitution · Affine · Vigenere · Hill · Permutation · One-Time Pad</p>
+</header>
+<main>
+  <div class="tabs">
+    <div class="tab on" id="tabText">Pesan Teks (26 huruf)</div>
+    <div class="tab" id="tabFile">File (byte)</div>
+  </div>
+
+  <div class="card">
+    <label for="cipher">Cipher</label>
+    <select id="cipher">
+      <option value="shift">1. Shift Cipher</option>
+      <option value="subst">2. Substitution Cipher</option>
+      <option value="affine">3. Affine Cipher</option>
+      <option value="vigenere">4. Vigenere Cipher</option>
+      <option value="hill">5. Hill Cipher</option>
+      <option value="perm">6. Permutation Cipher</option>
+      <option value="otp">7. One-Time Pad</option>
+    </select>
+
+    <div id="keyBlock">
+      <label for="key">Kunci</label>
+      <input type="text" id="key" autocomplete="off">
+    </div>
+    <div id="otpBlock" class="hide">
+      <label for="otpFile">File kunci One-Time Pad</label>
+      <input type="file" id="otpFile">
+      <div class="row">
+        <button class="sec" id="genOtp" type="button">Buat file kunci acak (50.000 huruf)</button>
+        <span class="hint" id="otpInfo">Belum ada file kunci dipilih.</span>
+      </div>
+    </div>
+    <div class="hint" id="keyHint"></div>
+  </div>
+
+  <!-- MODE TEKS -->
+  <div id="textMode">
+    <div class="card">
+      <div class="grid">
+        <div>
+          <label for="plain">Plainteks</label>
+          <textarea id="plain" placeholder="Ketik pesan di sini, atau muat dari file .txt"></textarea>
+          <div class="row">
+            <input type="file" id="plainFile" accept=".txt,text/plain">
+          </div>
+        </div>
+        <div>
+          <label for="cipherOut">Cipherteks</label>
+          <textarea id="cipherOut" placeholder="Hasil enkripsi muncul di sini (atau tempel cipherteks untuk didekripsi)"></textarea>
+          <div class="row">
+            <label class="radio"><input type="radio" name="fmt" value="plain" checked> Tanpa spasi</label>
+            <label class="radio"><input type="radio" name="fmt" value="g5"> Kelompok 5 huruf</label>
+          </div>
+          <div class="row">
+            <input type="file" id="cipherFile" accept=".txt,text/plain">
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <button id="btnEnc">Enkripsi ▶</button>
+        <button id="btnDec" class="dec">◀ Dekripsi</button>
+        <button id="btnSave" class="sec">Simpan cipherteks ke file</button>
+        <button id="btnClear" class="sec">Bersihkan</button>
+      </div>
+      <div class="hint">Mode teks hanya memproses huruf A–Z (huruf kecil diubah ke besar). Angka, spasi, dan tanda baca dibuang. Untuk Hill/Permutation, sisa blok diisi huruf X.</div>
+    </div>
+  </div>
+
+  <!-- MODE FILE -->
+  <div id="fileMode" class="hide">
+    <div class="card">
+      <label for="anyFile">Pilih file (teks maupun biner: docx, jpg, pdf, mp3, dst.)</label>
+      <input type="file" id="anyFile">
+      <div class="hint" id="fileInfo">Belum ada file.</div>
+      <div class="row">
+        <button id="btnFEnc">Enkripsi File</button>
+        <button id="btnFDec" class="dec">Dekripsi File (.dat)</button>
+      </div>
+      <div class="hint">Setiap byte (termasuk header) dienkripsi. File hasil enkripsi disimpan sebagai <code>.dat</code> dan menyimpan nama + ekstensi asli di dalamnya, sehingga saat didekripsi file kembali dengan nama/ekstensi semula.</div>
+      <div class="row"><span id="dlSlot"></span></div>
+    </div>
+  </div>
+
+  <div id="msg"></div>
+</main>
+
+<script src="ciphers.js"></script>
+<script>
+(function () {
+  const $ = id => document.getElementById(id);
+  const hints = {
+    shift:   'Kunci: satu bilangan bulat, contoh <code>7</code>.',
+    subst:   'Kunci: kata kunci (mis. <code>KRIPTO</code>) atau 26 huruf unik. Mode file: kata/teks apa saja (dibuat jadi permutasi 256 byte).',
+    affine:  'Kunci: <code>a,b</code> dengan gcd(a,26)=1 (mode teks), contoh <code>5,8</code>. Mode file: a harus ganjil (mod 256).',
+    vigenere:'Kunci: kata (huruf saja), contoh <code>LEMON</code>.',
+    hill:    'Kunci: matriks n×n (n=2..4). Angka dipisah koma per baris, contoh <code>3,3,2,5</code>, atau huruf (4/9/16 huruf) contoh <code>GYBNQKURP</code>. Determinan harus punya invers.',
+    perm:    'Kunci: permutasi 1..n, contoh <code>3,1,4,2</code>, atau kata, contoh <code>ZEBRA</code>. Panjang kunci = ukuran blok.',
+    otp:     'Kunci dibaca dari file teks huruf acak. Hanya sepanjang pesan yang dipakai; sisanya dibiarkan.'
+  };
+  let mode = 'text', otpBytes = null, srcFile = null;
+
+  function msg(t, ok) { const m = $('msg'); m.textContent = t; m.className = ok ? 'ok' : 'err'; }
+  function clearMsg() { $('msg').className = ''; $('msg').textContent = ''; }
+  function updateCipherUI() {
+    const c = $('cipher').value;
+    $('keyHint').innerHTML = hints[c];
+    $('keyBlock').classList.toggle('hide', c === 'otp');
+    $('otpBlock').classList.toggle('hide', c !== 'otp');
+  }
+  $('cipher').addEventListener('change', updateCipherUI);
+  updateCipherUI();
+
+  function setMode(m) {
+    mode = m;
+    $('tabText').classList.toggle('on', m === 'text'); $('tabFile').classList.toggle('on', m === 'file');
+    $('textMode').classList.toggle('hide', m !== 'text'); $('fileMode').classList.toggle('hide', m !== 'file');
+    clearMsg();
+  }
+  $('tabText').onclick = () => setMode('text'); $('tabFile').onclick = () => setMode('file');
+
+  $('otpFile').addEventListener('change', async e => {
+    const f = e.target.files[0]; if (!f) return;
+    otpBytes = new Uint8Array(await f.arrayBuffer());
+    $('otpInfo').textContent = 'File kunci: ' + f.name + ' (' + otpBytes.length + ' byte)';
+  });
+  function download(bytes, name, type) {
+    const url = URL.createObjectURL(new Blob([bytes], { type: type || 'application/octet-stream' }));
+    const a = document.createElement('a'); a.href = url; a.download = name; document.body.appendChild(a); a.click();
+    setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 500);
+  }
+  $('genOtp').onclick = () => {
+    const r = new Uint8Array(50000); crypto.getRandomValues(r);
+    let s = ''; for (const v of r) s += String.fromCharCode(65 + (v % 26)); // bias kecil, cukup untuk tugas
+    const bytes = new TextEncoder().encode(s);
+    download(bytes, 'otp_key.txt', 'text/plain');
+    otpBytes = bytes; $('otpInfo').textContent = 'Kunci acak baru dibuat & dipakai (50000 huruf), tersimpan sebagai otp_key.txt.';
+  };
+
+  const fmt = () => document.querySelector('input[name=fmt]:checked').value;
+  function showCipher(ct) { $('cipherOut').value = fmt() === 'g5' ? KC.group5(ct) : ct; }
+  document.querySelectorAll('input[name=fmt]').forEach(r => r.addEventListener('change', () => {
+    const ct = KC.lettersOnly($('cipherOut').value); if (ct) showCipher(ct);
+  }));
+  const keyStr = () => $('key').value;
+
+  $('plainFile').addEventListener('change', async e => { const f = e.target.files[0]; if (f) $('plain').value = await f.text(); });
+  $('cipherFile').addEventListener('change', async e => { const f = e.target.files[0]; if (f) $('cipherOut').value = await f.text(); });
+
+  $('btnEnc').onclick = () => {
+    clearMsg();
+    try {
+      const ct = KC.encryptText($('cipher').value, keyStr(), otpBytes, $('plain').value);
+      showCipher(ct); msg('Enkripsi berhasil (' + ct.length + ' huruf).', true);
+    } catch (e) { msg(e.message); }
+  };
+  $('btnDec').onclick = () => {
+    clearMsg();
+    try {
+      const pt = KC.decryptText($('cipher').value, keyStr(), otpBytes, $('cipherOut').value);
+      $('plain').value = pt.toLowerCase(); msg('Dekripsi berhasil. (Huruf X di akhir mungkin hanya padding.)', true);
+    } catch (e) { msg(e.message); }
+  };
+  $('btnSave').onclick = () => {
+    const t = $('cipherOut').value; if (!t.trim()) return msg('Belum ada cipherteks untuk disimpan.');
+    download(new TextEncoder().encode(t), 'cipherteks.txt', 'text/plain'); msg('Cipherteks disimpan ke cipherteks.txt.', true);
+  };
+  $('btnClear').onclick = () => { $('plain').value = ''; $('cipherOut').value = ''; clearMsg(); };
+
+  $('anyFile').addEventListener('change', e => {
+    srcFile = e.target.files[0] || null;
+    $('fileInfo').textContent = srcFile ? srcFile.name + ' (' + srcFile.size + ' byte)' : 'Belum ada file.';
+    $('dlSlot').textContent = '';
+  });
+  async function fileOp(dec) {
+    clearMsg(); $('dlSlot').textContent = '';
+    if (!srcFile) return msg('Pilih file terlebih dahulu.');
+    try {
+      const data = new Uint8Array(await srcFile.arrayBuffer()), c = $('cipher').value;
+      let out, name;
+      if (!dec) { out = KC.encryptFile(c, keyStr(), otpBytes, srcFile.name, data); name = srcFile.name.replace(/\.[^.]*$/, '') + '.dat'; }
+      else { const r = KC.decryptFile(c, keyStr(), otpBytes, data); out = r.data; name = r.name; }
+      const b = document.createElement('button'); b.textContent = 'Unduh ' + name;
+      b.onclick = () => download(out, name); $('dlSlot').appendChild(b);
+      msg((dec ? 'Dekripsi' : 'Enkripsi') + ' file berhasil: ' + name + ' (' + out.length + ' byte).', true);
+    } catch (e) { msg(e.message); }
+  }
+  $('btnFEnc').onclick = () => fileOp(false); $('btnFDec').onclick = () => fileOp(true);
+})();
+</script>
+</body>
+</html>
