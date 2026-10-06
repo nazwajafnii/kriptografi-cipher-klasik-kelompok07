@@ -2,7 +2,7 @@
 
 Tugas 1 Kriptografi (PSDKU Informatika, Universitas Sebelas Maret), semester ganjil 2026-2027.
 
-**Anggota kelompok:** Fidela Novelia, Laely Nisrina, Nazwa Nur Aisyiyah Jafni
+**Anggota kelompok:** Fidela Novelia NIM L0324012, Laely Nisrina NIM L0324019, Nazwa Nur Aisyiyah Jafni NIM L0324029
 
 ## Deskripsi
 Aplikasi web berbahasa JavaScript (tanpa framework dan tanpa instalasi) yang mengimplementasikan tujuh cipher klasik: Shift, Substitution, Affine, Vigenere, Hill, Permutation, dan One-Time Pad.
